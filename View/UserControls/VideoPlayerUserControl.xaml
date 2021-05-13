@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="VideoPlayer.View.UserControls.VideoPlayerUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:VideoPlayer.ViewModels"
+             xmlns:local="clr-namespace:VideoPlayer"
+             xmlns:gu="clr-namespace:Gu.Wpf.Media;assembly=Gu.Wpf.Media"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             >
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom" Height="100">
+            <DockPanel>
+                <Slider Margin="0 10 0 0" DockPanel.Dock="Top"
+                        Value="{Binding ElementName=VideoMediaElement, Path=Position, 
+                        Converter={x:Static gu:NullableTimeSpanToSecondsConverter.Default}}"
+                        Minimum="0"
+                        gu:Drag.PauseWhileDragging="{Binding ElementName=VideoMediaElement}"  
+                        Maximum="{Binding ElementName=VideoMediaElement, Path=Length,
+                        Converter={x:Static gu:NullableTimeSpanToSecondsConverter.Default}}" SmallChange="0.1
+                        " IsMoveToPointEnabled="True"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    
+                    <Button Height="50" Width="80">Back</Button>
+                    <ToggleButton Height="40" Width="80" 
+                                  Command="{Binding VideoPlayCommand}" 
+                                  CommandParameter="{Binding ElementName=VideoMediaElement}"
+                                  Foreground="Black">
+                        <ToggleButton.Style>
+                            <Style BasedOn="{StaticResource {x:Static gu:Styles.PlayerButtonBaseStyleKey}}" TargetType="{x:Type ToggleButton}">
+                                <Setter Property="gu:Icon.Geometry" Value="{StaticResource {x:Static gu:Geometries.PlayGeometryKey}}" />
+                                <Setter Property="Background" Value="White"></Setter>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaying, ElementName=VideoMediaElement}" Value="True">
+                                        <Setter Property="gu:Icon.Geometry" Value="{StaticResource {x:Static gu:Geometries.PauseGeometryKey}}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
+                    <Button Height="50" Width="80">Next</Button>
+                    <Slider Orientation="Horizontal" Width="60" 
+                            VerticalAlignment="Center" Margin="30 0"
+                            Value="{Binding ElementName=VideoMediaElement, Path=Volume}"
+                            Minimum="0" Maximum="1"></Slider>
+                </StackPanel>
+            </DockPanel>
+        </Grid>
+        <gu:MediaElementWrapper
+            Position="{Binding SelectedVideo.CurrentPosition}"
+            Source="{Binding SelectedVideo.Path}" 
+            LoadedBehavior="Play"
+            x:Name="VideoMediaElement" />
+    </DockPanel>
+</UserControl>
