@@ -1,10 +1,9 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
+using VideoPlayer.Models;
 
 namespace VideoPlayer.View.UserControls
 {
-    /// <summary>
-    /// Логика взаимодействия для VideoPlayerUserControll.xaml
-    /// </summary>
     public partial class VideoPlayerUserControl : UserControl
     {
         public VideoPlayerUserControl()

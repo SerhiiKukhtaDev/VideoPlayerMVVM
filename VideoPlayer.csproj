@@ -24,6 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -33,8 +34,12 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FontAwesome.WPF, Version=4.7.0.37774, Culture=neutral, PublicKeyToken=0758b07a11a4f466, processorArchitecture=MSIL">
+      <HintPath>packages\FontAwesome.WPF.4.7.0.9\lib\net40\FontAwesome.WPF.dll</HintPath>
+    </Reference>
     <Reference Include="Gu.Wpf.Media, Version=0.5.1.0, Culture=neutral, PublicKeyToken=aa972a35ea817caf, processorArchitecture=MSIL">
       <HintPath>packages\Gu.Wpf.Media.0.5.1\lib\net45\Gu.Wpf.Media.dll</HintPath>
     </Reference>
@@ -74,14 +79,18 @@
     </Compile>
     <Compile Include="Infrastructure\Commands\ActionCommand.cs" />
     <Compile Include="Infrastructure\Commands\Base\Command.cs" />
+    <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\Video.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Services\FolderService.cs" />
+    <Compile Include="Services\VideoService.cs" />
+    <Compile Include="Utils\FolderPicker.cs" />
+    <Compile Include="Utils\NaturalComparer.cs" />
     <Compile Include="View\UserControls\VideoPlayerUserControl.xaml.cs">
       <DependentUpon>VideoPlayerUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\Base\ViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
-    <Compile Include="ViewModels\VideoPlayerViewModel.cs" />
     <Compile Include="View\Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

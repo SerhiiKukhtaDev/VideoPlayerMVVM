@@ -6,19 +6,100 @@
         xmlns:local="clr-namespace:VideoPlayer"
         xmlns:user="clr-namespace:VideoPlayer.View.UserControls"
         xmlns:vm = "clr-namespace:VideoPlayer.ViewModels"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="{Binding Title}" Height="450" Width="800">
+        SizeToContent="Manual"
+        xmlns:gu="clr-namespace:Gu.Wpf.Media;assembly=Gu.Wpf.Media"
+        Title="{Binding Title}" Height="450" Width="800" Background="#FF3A3838">
     <Window.DataContext>
         <vm:MainWindowViewModel></vm:MainWindowViewModel>
     </Window.DataContext>
     <Grid>
-        <DockPanel>
-            <Menu DockPanel.Dock="Top">
-                <MenuItem Header="Файл">
-                    <MenuItem Header="Відкрити" Command="{Binding OpenVideoCommand}"></MenuItem>
+        <!--<Menu DockPanel.Dock="Top">
+                <MenuItem Header="Файл"  Background="Black" Foreground="White">
+                    <MenuItem Header="Відкрити файл" Command="{Binding OpenVideoCommand}"></MenuItem>
+                    <MenuItem Header="Відкрити папку" Command="{Binding OpenVideoCommand}"></MenuItem>
                 </MenuItem>
-            </Menu>
-            <user:VideoPlayerUserControl DataContext="{Binding VideoPlayerViewModel}"></user:VideoPlayerUserControl>
-        </DockPanel>
+            </Menu>-->
+        <user:VideoPlayerUserControl />
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="4*"></ColumnDefinition>
+                <ColumnDefinition Width="5*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+
+            <Grid>
+                <DockPanel>
+                    <Grid Height="26" DockPanel.Dock="Top" Background="White">
+                        <Border>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Button Command="{Binding OpenFolderCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Folder" Margin="5"></fa:ImageAwesome>
+                                        <TextBlock FontSize="14" Text="Відкрити папку" VerticalAlignment="Center"></TextBlock>
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="1" Command="{Binding OpenVideoCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="FileVideoOutline" Margin="5"></fa:ImageAwesome>
+                                        <TextBlock FontSize="14" Text="Відкрити відео" VerticalAlignment="Center"></TextBlock>
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <ListBox Name="FoldersBox" 
+                                 SelectedItem="{Binding SelectedFolder}"
+                                 ItemsSource="{Binding CurrentFolder.Folders}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Width="Auto" HorizontalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5">
+                                        <fa:ImageAwesome Icon="Folder" Width="50" HorizontalAlignment="Center"></fa:ImageAwesome>
+                                        <TextBlock Text="{Binding Name}"></TextBlock>
+                                        <StackPanel.InputBindings>
+                                            <MouseBinding MouseAction="LeftDoubleClick"
+                                                          Command="{Binding DataContext.ChangeCurrentFolder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
+                                        </StackPanel.InputBindings>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBoxItem>
+                                <TextBlock Text="Atata"></TextBlock>
+                            </ListBoxItem>
+                        </ListBox>
+                        <ListBox ItemsSource="{Binding CurrentFolder.Videos}"
+                                 Grid.Column="1"
+                                 SelectedItem="{Binding SelectedVideo}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Width="Auto" Orientation="Vertical">
+                                        <fa:ImageAwesome Icon="FileVideoOutline" Width="50"></fa:ImageAwesome>
+                                        <TextBlock TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
+                                        <StackPanel.InputBindings>
+                                            <MouseBinding MouseAction="LeftDoubleClick"
+                                                          Command="{Binding DataContext.ChangeCurrentVideo, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
+                                        </StackPanel.InputBindings>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </DockPanel>
+            </Grid>
+            <GridSplitter Grid.Column="0" Width="2" Background="Blue" Panel.ZIndex="0
+                          "></GridSplitter>
+        </Grid>
+
     </Grid>
 </Window>

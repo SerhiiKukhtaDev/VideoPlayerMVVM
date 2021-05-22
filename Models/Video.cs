@@ -8,6 +8,6 @@ namespace VideoPlayer.Models
 
         public Uri Path { get; set; }
 
-        public string CurrentPosition { get; set; }
+        public TimeSpan? CurrentPosition { get; set; }
     }
 }
