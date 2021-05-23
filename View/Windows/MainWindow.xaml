@@ -29,71 +29,84 @@
                 <ColumnDefinition Width="5*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Grid>
+            <Grid Background="White" Opacity="1" ZIndex="999">
                 <DockPanel>
-                    <Grid Height="26" DockPanel.Dock="Top" Background="White">
-                        <Border>
-                            <Grid>
+                    <Button DockPanel.Dock="Right" Height="20" Width="20" Margin="0 0 -20 0"></Button>
+                    <Grid Height="15" DockPanel.Dock="Bottom">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock DockPanel.Dock="Bottom" Height="15"
+                                       Text="{Binding CurrentFolder.Folders.Count, StringFormat='Кількість папок: {0}'}"></TextBlock>
+                        <TextBlock Grid.Column="1" DockPanel.Dock="Bottom" 
+                                   Text="{Binding CurrentFolder.Videos.Count, StringFormat='Кількість відео: {0}'}"></TextBlock>
+                    </Grid>
+                    <Grid Height="26" DockPanel.Dock="Top">
+                        <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                     <ColumnDefinition Width="*"></ColumnDefinition>
                                 </Grid.ColumnDefinitions>
 
-                                <Button Command="{Binding OpenFolderCommand}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="Folder" Margin="5"></fa:ImageAwesome>
-                                        <TextBlock FontSize="14" Text="Відкрити папку" VerticalAlignment="Center"></TextBlock>
-                                    </StackPanel>
-                                </Button>
-                                <Button Grid.Column="1" Command="{Binding OpenVideoCommand}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <fa:ImageAwesome Icon="FileVideoOutline" Margin="5"></fa:ImageAwesome>
-                                        <TextBlock FontSize="14" Text="Відкрити відео" VerticalAlignment="Center"></TextBlock>
-                                    </StackPanel>
-                                </Button>
-                            </Grid>
-                        </Border>
+                                <Button 
+                                    Style="{StaticResource OpenFolderButton}" 
+                                    Margin="2" 
+                                    Command="{Binding OpenFolderCommand}" />
+                                <Button Margin="2"  
+                                        Style="{StaticResource OpenFileButton}"
+                                        Grid.Column="1" 
+                                        Command="{Binding OpenVideoCommand}" />
+                        </Grid>
                     </Grid>
-                    <Grid>
+                    <Grid> 
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
-                        <ListBox Name="FoldersBox" 
-                                 SelectedItem="{Binding SelectedFolder}"
-                                 ItemsSource="{Binding CurrentFolder.Folders}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Width="Auto" HorizontalAlignment="Stretch" Orientation="Vertical" RenderTransformOrigin="0.5,0.5">
-                                        <fa:ImageAwesome Icon="Folder" Width="50" HorizontalAlignment="Center"></fa:ImageAwesome>
-                                        <TextBlock Text="{Binding Name}"></TextBlock>
-                                        <StackPanel.InputBindings>
-                                            <MouseBinding MouseAction="LeftDoubleClick"
-                                                          Command="{Binding DataContext.ChangeCurrentFolder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
-                                        </StackPanel.InputBindings>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                            <ListBoxItem>
-                                <TextBlock Text="Atata"></TextBlock>
-                            </ListBoxItem>
-                        </ListBox>
-                        <ListBox ItemsSource="{Binding CurrentFolder.Videos}"
-                                 Grid.Column="1"
-                                 SelectedItem="{Binding SelectedVideo}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Width="Auto" Orientation="Vertical">
-                                        <fa:ImageAwesome Icon="FileVideoOutline" Width="50"></fa:ImageAwesome>
-                                        <TextBlock TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
-                                        <StackPanel.InputBindings>
-                                            <MouseBinding MouseAction="LeftDoubleClick"
-                                                          Command="{Binding DataContext.ChangeCurrentVideo, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
-                                        </StackPanel.InputBindings>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
+                        <DockPanel>
+                            <Button Margin="2" 
+                                    MaxHeight="20"
+                                    Style="{StaticResource GoBackButton}"
+                                    Command="{Binding BackToLastFolderCommand}"
+                                DockPanel.Dock="Top">
+                                
+                            </Button>
+                            <ListBox ItemContainerStyle="{StaticResource ListBoxItemBase}" Name="FoldersBox" 
+                                     SelectedItem="{Binding SelectedFolder}"
+                                     ItemsSource="{Binding CurrentFolder.Folders}" BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" Margin="5">
+                                            <fa:ImageAwesome Icon="Folder" Width="50" HorizontalAlignment="Center"></fa:ImageAwesome>
+                                            <TextBlock HorizontalAlignment="Center" Margin="2" TextWrapping="NoWrap" Text="{Binding Name}"></TextBlock>
+                                            <StackPanel.InputBindings>
+                                                <MouseBinding MouseAction="LeftDoubleClick"
+                                                              Command="{Binding DataContext.ChangeCurrentFolder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
+                                            </StackPanel.InputBindings>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                        <DockPanel Grid.Column="1">
+                            <ListBox ItemsSource="{Binding CurrentFolder.Videos}"
+                                     SelectedItem="{Binding SelectedVideo}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Width="Auto" Orientation="Vertical">
+                                            <fa:ImageAwesome Icon="FileVideoOutline" Width="50"></fa:ImageAwesome>
+                                            <TextBlock TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
+                                            <StackPanel.InputBindings>
+                                                <MouseBinding MouseAction="LeftDoubleClick"
+                                                              Command="{Binding DataContext.ChangeCurrentVideo, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
+                                            </StackPanel.InputBindings>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
                     </Grid>
                 </DockPanel>
             </Grid>

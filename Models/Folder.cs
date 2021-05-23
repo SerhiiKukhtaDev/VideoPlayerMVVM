@@ -4,7 +4,7 @@ namespace VideoPlayer.Models
 {
     public class Folder
     {
-        public IEnumerable<Folder> Folders { get; set; }
+        public IEnumerable<SimpleFolder> Folders { get; set; }
 
         public IEnumerable<Video> Videos { get; set; }
 

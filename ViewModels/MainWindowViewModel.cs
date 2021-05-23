@@ -64,10 +64,10 @@ namespace VideoPlayer.ViewModels
         #region selectedFolder : Folder - SelectedFoler
 
         ///<summary>SelectedFoler</summary>
-        private Folder _selectedFolder;
+        private SimpleFolder _selectedFolder;
 
         ///<summary>Selected Foler</summary>
-        public Folder SelectedFolder
+        public SimpleFolder SelectedFolder
         {
             get => _selectedFolder;
             set => Set(ref _selectedFolder, value);
@@ -83,6 +83,26 @@ namespace VideoPlayer.ViewModels
         {
             get => _currentFolder;
             set => Set(ref _currentFolder, value);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region lastFolder : Stack<SimpleFolder> - Last opened folder
+
+        private readonly Stack<SimpleFolder> _lastFolders;
+
+        #region SimpleFolder : SimpleFolder - Last Folder
+
+        ///<summary>Last Folder</summary>
+        private SimpleFolder _lastFolder;
+
+        ///<summary>Last Folder</summary>
+        public SimpleFolder LastFolder
+        {
+            get => _lastFolder;
+            set => Set(ref _lastFolder, value);
         }
 
         #endregion
@@ -159,10 +179,15 @@ namespace VideoPlayer.ViewModels
 
         private void OnChangeCurrentFolderExecuted(object p)
         {
+            LastFolder = new SimpleFolder {Name = CurrentFolder.Name, Path = CurrentFolder.Path};
+            _lastFolders.Push(LastFolder);
+
             CurrentFolder = new Folder
             {
                 Folders = FolderService.GetFolders(SelectedFolder.Path),
-                Videos = VideoService.GetVideos(SelectedFolder.Path, "mkv")
+                Videos = VideoService.GetVideos(SelectedFolder.Path, "mkv"),
+                Name = SelectedFolder.Name,
+                Path = SelectedFolder.Path
             };
         }
 
@@ -182,11 +207,36 @@ namespace VideoPlayer.ViewModels
             CurrentFolder = new Folder
             {
                 Videos = VideoService.GetVideos(dlg.ResultPath, "mkv"),
-                Folders = FolderService.GetFolders(dlg.ResultPath)
+                Folders = FolderService.GetFolders(dlg.ResultPath),
+                Name = dlg.ResultName,
+                Path = dlg.ResultPath
             };
         }
 
         private bool CanOpenFolderCommandExecute(object p) => true;
+
+        #endregion
+
+        #region BackToLastFolderCommand
+
+        public ICommand BackToLastFolderCommand { get; }
+
+        private void OnBackToLastFolderCommandExecuted(object p)
+        {
+            LastFolder = _lastFolders.Pop();
+
+            CurrentFolder = new Folder
+            {
+                Folders = FolderService.GetFolders(LastFolder.Path),
+                Videos = VideoService.GetVideos(LastFolder.Path, "mkv"),
+                Name = LastFolder.Name,
+                Path = LastFolder.Path
+            };
+
+            if(_lastFolders.Count > 0) LastFolder = _lastFolders.Peek();
+        }
+
+        private bool CanBackToLastFolderCommandExecute(object p) => _lastFolders.Count > 0;
 
         #endregion
 
@@ -200,6 +250,9 @@ namespace VideoPlayer.ViewModels
             ChangeCurrentVideo = new ActionCommand(OnChangeCurrentVideoExecuted, CanChangeCurrentVideoExecute);
             OpenFolderCommand = new ActionCommand(OnOpenFolderCommandExecuted, CanOpenFolderCommandExecute);
             ChangeCurrentFolder = new ActionCommand(OnChangeCurrentFolderExecuted, CanChangeCurrentFolderExecute);
+            BackToLastFolderCommand =
+                new ActionCommand(OnBackToLastFolderCommandExecuted, CanBackToLastFolderCommandExecute);
+            _lastFolders = new Stack<SimpleFolder>();
         }
     }
 }
