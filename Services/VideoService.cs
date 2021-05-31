@@ -2,28 +2,32 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using VideoPlayer.Models;
 using VideoPlayer.Utils;
+using Application = System.Windows.Application;
 
 namespace VideoPlayer.Services
 {
     public class VideoService
     {
-        public static IEnumerable<Video> GetVideos(string path, params string[] exts)
+        private static readonly string[] Exts = {"mp4", "mkv"};
+
+        public static List<Video> GetVideos(string path)
         {
-            IEnumerable<string> videos = Directory
+            List<Video> videos = Directory
                 .EnumerateFiles(path, "*.*")
-                .Where(file => exts.Any(x => file.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
+                .Where(file => Exts.Any(x => file.EndsWith(x, StringComparison.OrdinalIgnoreCase)))
+                .OrderBy(str => str, new NaturalComparer())
+                .Select(str => new Video
+                {
+                    Path = new Uri(str),
+                    CurrentPosition = default,
+                    Name = Path.GetFileName(str)
+                })
+                .ToList();
 
-            List<string> list = new List<string>(videos);
-            list.Sort(new NaturalComparer());
-
-            return list.Select(str => new Video()
-            {
-                Path = new Uri(str),
-                CurrentPosition = default,
-                Name = Path.GetFileName(str)
-            });
+            return videos;
         }
     }
 }

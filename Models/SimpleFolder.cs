@@ -1,6 +1,8 @@
-﻿namespace VideoPlayer.Models
+﻿using VideoPlayer.Models.Interfaces;
+
+namespace VideoPlayer.Models
 {
-    public class SimpleFolder
+    public class SimpleFolder : IFolder
     {
         public string Path { get; set; }
 

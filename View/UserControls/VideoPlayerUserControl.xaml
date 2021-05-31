@@ -6,6 +6,9 @@
              
              xmlns:local="clr-namespace:VideoPlayer"
              xmlns:gu="clr-namespace:Gu.Wpf.Media;assembly=Gu.Wpf.Media"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:utils="clr-namespace:VideoPlayer.Utils"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -15,9 +18,10 @@
         <gu:MediaElementWrapper Source="{Binding CurrentPlayedVideo.Path, Mode=OneWay}"
                                 Position="{Binding CurrentPlayedVideo.CurrentPosition}"
                                 LoadedBehavior="Play"
-                                x:Name="VideoMediaElement" Stretch="Uniform"/>
+                                x:Name="VideoMediaElement" Stretch="Uniform">
+        </gu:MediaElementWrapper>
 
-        <Grid Height="180"  Opacity="0.5" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
+        <Grid Visibility="{Binding ElVisibility}" Height="180"  Opacity="0.5" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
             <Grid.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#66000000" Offset="1"/>
@@ -28,10 +32,10 @@
                 </LinearGradientBrush>
             </Grid.Background>
         </Grid>
-        <Grid Height="150" VerticalAlignment="Bottom" ZIndex="1" >
+        <Grid Visibility="{Binding ElVisibility}" Height="150" VerticalAlignment="Bottom" ZIndex="1" >
             <DockPanel Dock="Bottom">
                 <TextBlock FontWeight="Light"  Margin="10 0 0 0" DockPanel.Dock="Top" Foreground="{StaticResource VideoPlayerButtonColor}"
-                           FontSize="28" Text="{Binding SelectedVideo.Name, FallbackValue='Відкрийте відео'}"></TextBlock>
+                           FontSize="28" Text="{Binding CurrentPlayedVideo.Name, FallbackValue='Відкрийте відео'}"></TextBlock>
                 <DockPanel DockPanel.Dock="Top">
                     <StackPanel Orientation="Vertical">
                         <Slider Margin="0 10 0 0" 
@@ -62,6 +66,18 @@
 
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Style="{StaticResource CornerButton1}" Command="{Binding PlayPrevNextVideoCommand}"
+                            CommandParameter="-1">
+                        <Button.Content>
+                            <fa:ImageAwesome x:Name="DoubleArrowLeftButton" Margin="5" Foreground="{StaticResource VideoPlayerButtonColor}" Icon="AngleDoubleLeft"></fa:ImageAwesome>
+                        </Button.Content>
+                    </Button>
+                    <Button Command="{Binding PlayPrevNextVideoCommand}" 
+                            CommandParameter="1" Style="{StaticResource CornerButton1}">
+                        <Button.Content>
+                            <fa:ImageAwesome Margin="5" Foreground="{StaticResource VideoPlayerButtonColor}" Icon="AngleDoubleRight"></fa:ImageAwesome>
+                        </Button.Content>
+                    </Button>
                     <ToggleButton Height="40" Width="80" Background="Transparent"
                                   Command="TogglePlayPause" 
                                   CommandTarget="{Binding ElementName=VideoMediaElement}"
@@ -106,22 +122,19 @@
                                 Minimum="0" Maximum="1" IsMoveToPointEnabled="True">
                         </Slider>
                     </StackPanel>
-                    <Button Height="40" Width="80" Foreground="{StaticResource VideoPlayerButtonColor}"
-                            HorizontalAlignment="Right"
-                            Command="{Binding ToggleFullScreenCommand}"
-                            CommandParameter="{Binding ElementName=VideoMediaElement}"
-                            IsEnabled="{Binding ElementName=VideoMediaElement,
-                                            Path=HasMedia}"
-                            Padding="12,6,6,6" >
-                        <Button.Style>
-                            <Style BasedOn="{StaticResource {x:Static gu:Styles.PlayerButtonBaseStyleKey}}" TargetType="{x:Type Button}">
-                                <Setter Property="gu:Icon.Geometry" 
-                                        Value="{StaticResource {x:Static gu:Geometries.FullScreenGeometryKey}}" />
-                            </Style>
-                        </Button.Style>
+                    <Button x:Name="ChangePosWithStoppedTimeButton" Foreground="White" Width="120" 
+                            Style="{StaticResource VideoTextButton}"
+                            Command="{Binding ChangeCurrentPositionWithStoppedTimeCommand}"
+                            CommandParameter="-1">
+                        <Button.Content>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="Ви зупинились на"></TextBlock>
+                                <TextBlock TextAlignment="Center" Text="{Binding CurrentPlayedVideo.StoppedPosition,
+                                    Converter={x:Static gu:TimeSpanToStringConverter.Default}}"></TextBlock>
+                            </StackPanel>
+                        </Button.Content>
                     </Button>
                 </StackPanel>
-
             </DockPanel>
         </Grid>
 

@@ -4,34 +4,75 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VideoPlayer"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:user="clr-namespace:VideoPlayer.View.UserControls"
         xmlns:vm = "clr-namespace:VideoPlayer.ViewModels"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         SizeToContent="Manual"
         xmlns:gu="clr-namespace:Gu.Wpf.Media;assembly=Gu.Wpf.Media"
-        Title="{Binding Title}" Height="450" Width="800" Background="#FF3A3838">
+        Title="{Binding Title}" Height="450" Width="800" Background="#FF3A3838"
+        Cursor="{Binding Cursor}">
     <Window.DataContext>
         <vm:MainWindowViewModel></vm:MainWindowViewModel>
     </Window.DataContext>
     <Grid>
-        <!--<Menu DockPanel.Dock="Top">
-                <MenuItem Header="Файл"  Background="Black" Foreground="White">
-                    <MenuItem Header="Відкрити файл" Command="{Binding OpenVideoCommand}"></MenuItem>
-                    <MenuItem Header="Відкрити папку" Command="{Binding OpenVideoCommand}"></MenuItem>
-                </MenuItem>
-            </Menu>-->
+        <i:Interaction.Triggers>
+            <i:EventTrigger EventName="MouseMove">
+                <i:InvokeCommandAction Command="{Binding ChangeVisibilityCommand}"   CommandParameter="False"/>
+            </i:EventTrigger>
+        </i:Interaction.Triggers>
         <user:VideoPlayerUserControl />
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"></ColumnDefinition>
+                <ColumnDefinition>
+                    <ColumnDefinition.Style>
+                        <Style TargetType="ColumnDefinition">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsMin}" Value="True">
+                                    <Setter Property="Width" Value="0"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsMin}" Value="False">
+                                    <Setter Property="Width" Value="4*"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ColumnDefinition.Style>
+                </ColumnDefinition>
                 <ColumnDefinition Width="5*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
 
-            <Grid Background="White" Opacity="1" ZIndex="999">
+            <Grid Background="White" Opacity="1" ZIndex="999" Visibility="{Binding ElVisibility}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseEnter">
+                        <i:InvokeCommandAction Command="{Binding SetMouseStateCommand}"   CommandParameter="False"/>
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="MouseLeave">
+                        <i:InvokeCommandAction Command="{Binding SetMouseStateCommand}"   CommandParameter="True"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <DockPanel>
-                    <Button DockPanel.Dock="Right" Height="20" Width="20" Margin="0 0 -20 0"></Button>
+                    <Button Height="30" Width="30" Style="{StaticResource CircleButton}" 
+                            DockPanel.Dock="Right" 
+                            Command="{Binding ToggleMinCommand}">
+                        <Button.Content>
+                            <fa:ImageAwesome Foreground="White" Margin="7">
+                                <fa:ImageAwesome.Style>
+                                    <Style TargetType="fa:ImageAwesome">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsMin}" Value="True">
+                                                <Setter Property="Icon" Value="ArrowRight"></Setter>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsMin}" Value="False">
+                                                <Setter Property="Icon" Value="ArrowLeft"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </fa:ImageAwesome.Style>
+                            </fa:ImageAwesome>
+                        </Button.Content>
+                    </Button>
                     <Grid Height="15" DockPanel.Dock="Bottom">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -60,7 +101,14 @@
                                         Command="{Binding OpenVideoCommand}" />
                         </Grid>
                     </Grid>
-                    <Grid> 
+                    <Grid>
+                        <Grid.Resources>
+                            <ResourceDictionary>
+                                <ResourceDictionary.MergedDictionaries>
+                                    <ResourceDictionary Source="../../Resources/DataTemplates/ListBoxDataTemplates.xaml"></ResourceDictionary>
+                                </ResourceDictionary.MergedDictionaries>
+                            </ResourceDictionary>
+                        </Grid.Resources> 
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
                             <ColumnDefinition Width="*"></ColumnDefinition>
@@ -70,48 +118,30 @@
                                     MaxHeight="20"
                                     Style="{StaticResource GoBackButton}"
                                     Command="{Binding BackToLastFolderCommand}"
-                                DockPanel.Dock="Top">
-                                
+                                    DockPanel.Dock="Top">
                             </Button>
-                            <ListBox ItemContainerStyle="{StaticResource ListBoxItemBase}" Name="FoldersBox" 
+                            <ListBox ItemContainerStyle="{StaticResource ListBoxFolderItem}"
                                      SelectedItem="{Binding SelectedFolder}"
-                                     ItemsSource="{Binding CurrentFolder.Folders}" BorderThickness="0">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel HorizontalAlignment="Stretch" Orientation="Horizontal" Margin="5">
-                                            <fa:ImageAwesome Icon="Folder" Width="50" HorizontalAlignment="Center"></fa:ImageAwesome>
-                                            <TextBlock HorizontalAlignment="Center" Margin="2" TextWrapping="NoWrap" Text="{Binding Name}"></TextBlock>
-                                            <StackPanel.InputBindings>
-                                                <MouseBinding MouseAction="LeftDoubleClick"
-                                                              Command="{Binding DataContext.ChangeCurrentFolder, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
-                                            </StackPanel.InputBindings>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
+                                     ItemsSource="{Binding CurrentFolder.Folders}" BorderThickness="0"
+                                     ItemTemplate="{StaticResource FolderListBoxItemDataTemplate}" />
                         </DockPanel>
                         <DockPanel Grid.Column="1">
                             <ListBox ItemsSource="{Binding CurrentFolder.Videos}"
-                                     SelectedItem="{Binding SelectedVideo}">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Width="Auto" Orientation="Vertical">
-                                            <fa:ImageAwesome Icon="FileVideoOutline" Width="50"></fa:ImageAwesome>
-                                            <TextBlock TextWrapping="Wrap" Text="{Binding Name}"></TextBlock>
-                                            <StackPanel.InputBindings>
-                                                <MouseBinding MouseAction="LeftDoubleClick"
-                                                              Command="{Binding DataContext.ChangeCurrentVideo, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListBox}}}"/>
-                                            </StackPanel.InputBindings>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
+                                     SelectedIndex="{Binding SelectedIndex}"
+                                     SelectedItem="{Binding SelectedVideo}"
+                                     ItemContainerStyle="{StaticResource ListBoxVideoItem}"
+                                     ItemTemplate="{StaticResource VideoListBoxItemDataTemplate}" 
+                                     BorderThickness="1,0,0,0">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="SourceUpdated">
+                                        <i:InvokeCommandAction Command="{Binding VideosSourceUpdateCommand, NotifyOnSourceUpdated=True}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
                             </ListBox>
                         </DockPanel>
                     </Grid>
                 </DockPanel>
             </Grid>
-            <GridSplitter Grid.Column="0" Width="2" Background="Blue" Panel.ZIndex="0
-                          "></GridSplitter>
         </Grid>
 
     </Grid>

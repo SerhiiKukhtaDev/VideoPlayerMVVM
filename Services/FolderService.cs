@@ -9,12 +9,11 @@ namespace VideoPlayer.Services
     {
         public static IEnumerable<SimpleFolder> GetFolders(string path)
         {
-            return Directory.EnumerateDirectories(path)
-                .Select(str => new SimpleFolder()
-                {
-                    Name = Path.GetFileName(str),
-                    Path = str
-                });
-        } 
+            return from str in Directory.EnumerateDirectories(path)
+                   where FileAttributes.System != (File.GetAttributes(str) & FileAttributes.System) &&
+                         FileAttributes.Hidden != (File.GetAttributes(str) & FileAttributes.Hidden)
+                   select new SimpleFolder { Name = Path.GetFileName(str), Path = str };
+
+        }
     }
 }
