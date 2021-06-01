@@ -46,10 +46,10 @@
             <Grid Background="White" Opacity="1" ZIndex="999" Visibility="{Binding ElVisibility}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseEnter">
-                        <i:InvokeCommandAction Command="{Binding SetMouseStateCommand}"   CommandParameter="False"/>
+                        <i:InvokeCommandAction Command="{Binding VideoElementHoveredCommand}"   CommandParameter="False"/>
                     </i:EventTrigger>
                     <i:EventTrigger EventName="MouseLeave">
-                        <i:InvokeCommandAction Command="{Binding SetMouseStateCommand}"   CommandParameter="True"/>
+                        <i:InvokeCommandAction Command="{Binding VideoElementHoveredCommand}"   CommandParameter="True"/>
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <DockPanel>
@@ -132,17 +132,11 @@
                                      ItemContainerStyle="{StaticResource ListBoxVideoItem}"
                                      ItemTemplate="{StaticResource VideoListBoxItemDataTemplate}" 
                                      BorderThickness="1,0,0,0">
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="SourceUpdated">
-                                        <i:InvokeCommandAction Command="{Binding VideosSourceUpdateCommand, NotifyOnSourceUpdated=True}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
                             </ListBox>
                         </DockPanel>
                     </Grid>
                 </DockPanel>
             </Grid>
         </Grid>
-
     </Grid>
 </Window>

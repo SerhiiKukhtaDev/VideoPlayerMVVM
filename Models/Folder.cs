@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
-using Newtonsoft.Json;
 using VideoPlayer.Models.Interfaces;
 
 namespace VideoPlayer.Models

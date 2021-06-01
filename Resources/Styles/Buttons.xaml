@@ -3,8 +3,16 @@
                     xmlns:fa="http://schemas.fontawesome.io/icons/"
                     xmlns:utils="clr-namespace:VideoPlayer.Utils"
                     xmlns:media="https://github.com/JohanLarsson/Gu.Wpf.Media">
+
+
+    <SolidColorBrush x:Key="VideoPlayerButtonColor" Color="WhiteSmoke" />
+    <SolidColorBrush x:Key="BlueButtonForeground" Color="CornflowerBlue"></SolidColorBrush>
+    <SolidColorBrush x:Key="TextButtonHoverColor" Color="Thistle" />
+    <SolidColorBrush x:Key="BlueButtonHoveredForeground" Color="RoyalBlue"></SolidColorBrush>
+
+
     <Style TargetType="Button" x:Key="BlueButton">
-        <Setter Property="Background" Value="CornflowerBlue"/>
+        <Setter Property="Background" Value="{StaticResource BlueButtonForeground}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="FontSize" Value="15"/>
         <Setter Property="Margin" Value="5"/>
@@ -22,7 +30,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="RoyalBlue"/>
+                <Setter Property="Background" Value="{StaticResource BlueButtonHoveredForeground}"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -87,7 +95,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="CornerButton1" TargetType="{x:Type Button}">
+    <Style x:Key="CornerButton" TargetType="{x:Type Button}">
         <Setter Property="Height" Value="40"/>
         <Setter Property="Width" Value="80"></Setter>
         <Setter Property="Padding" Value="24,6"/>
@@ -115,13 +123,9 @@
         </Setter>
     </Style>
 
-    <Style x:Key="VideoTextButton" TargetType="{x:Type Button}">
+    <Style x:Key="VideoTextButton" BasedOn="{StaticResource CornerButton}" TargetType="{x:Type Button}">
         <Setter Property="Margin" Value="20 0 0 0"></Setter>
-        <Setter Property="Height" Value="40"/>
-        <Setter Property="Width" Value="80"></Setter>
-        <Setter Property="Padding" Value="24,6"/>
-        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource VideoPlayerButtonColor}"></Setter>
         <Setter Property="Visibility" Value="Hidden"></Setter>
         <Setter Property="IsEnabled" Value="False"></Setter>
         <Setter Property="Template">
@@ -140,6 +144,9 @@
                 <Setter Property="Visibility" Value="Visible"></Setter>
                 <Setter  Property="IsEnabled" Value="True"></Setter>
             </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource TextButtonHoverColor}"></Setter>
+            </Trigger>
         </Style.Triggers>
     </Style>
 

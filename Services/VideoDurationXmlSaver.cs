@@ -12,18 +12,32 @@ namespace VideoPlayer.Services
         private readonly string _path;
         private readonly XDocument _xDocument;
         private readonly XElement _xRoot;
+        private readonly long _maxSize;
 
-        public VideoDurationXmlSaver(string path)
+        public VideoDurationXmlSaver(string path, long maxSize)
         {
             _path = path;
-            _xDocument = XDocument.Load(_path);
+            try
+            {
+                _xDocument = XDocument.Load(_path);
+            }
+            catch (Exception)
+            {
+                RestoreDefault();
+                _xDocument = XDocument.Load(_path);
+            }
+            
             _xRoot = _xDocument.Root;
+            _maxSize = maxSize;
+
+            if (_xRoot == null || new FileInfo(_path).Length / 1024 > maxSize) RestoreDefault();
         }
 
         public void SaveToXml(Folder folder)
         {
-            if(folder.Videos == null) return;
+            if (folder.Videos == null) return;
             if (folder.Videos.Count <= 0) return;
+
 
             if (!FolderExist(folder.Path))
             {
@@ -33,6 +47,8 @@ namespace VideoPlayer.Services
             {
                 Replace(folder.Videos.Where(v => v.CurrentPosition != null), folder.Path);
             }
+
+            if(new FileInfo(_path).Length / 1024 > _maxSize) RestoreDefault();
         }
 
         public TimeSpan? GetDurationFromXml(string path, string fileName)
@@ -40,19 +56,21 @@ namespace VideoPlayer.Services
             string folderPath = Path.GetDirectoryName(path);
             XElement xFolder = FindNode(folderPath);
 
-            if(xFolder == null) return null;
+            var xVideos = xFolder?.Element("Videos")?.Elements();
 
-            TimeSpan? duration = null;
+            if (xVideos == null) return null;
 
-            foreach (var xElement in xFolder.Element("Videos")?.Elements())
+            foreach (var xElement in xVideos)
             {
-                if (xElement.Element("Name") != null && xElement.Element("Name").Value == fileName)
-                {
-                    duration = TimeSpan.Parse(xElement.Element("Duration").Value);
-                }   
+                var xVideoName = xElement.Element("Name")?.Value;
+                var xVideoDuration = xElement.Element("Duration")?.Value;
+
+                if(xVideoName == null || xVideoDuration == null || xVideoName != fileName) continue;
+
+                return TimeSpan.TryParse(xVideoDuration, out var duration) ? duration : (TimeSpan?) null;
             }
 
-            return duration;
+            return null;
         }
 
         public void Replace(IEnumerable<Video> videos, string path)
@@ -125,6 +143,15 @@ namespace VideoPlayer.Services
             if (penCategory.Count <= 0) return null;
 
             return penCategory.First();
+        }
+
+        private void RestoreDefault()
+        {
+            string defaultXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n" + 
+                                "<Folders xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+                                "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  \r\n</Folders>";
+
+            File.WriteAllText(_path, defaultXml);
         }
     }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using VideoPlayer.Models;
 using VideoPlayer.Utils;
 using Application = System.Windows.Application;

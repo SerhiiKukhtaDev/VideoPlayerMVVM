@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
-using System.Threading;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using Gu.Wpf.Media;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using VideoPlayer.Infrastructure.Commands;
 using VideoPlayer.Models;
 using VideoPlayer.Models.Interfaces;
 using VideoPlayer.Services;
 using VideoPlayer.ViewModels.Base;
-using Application = System.Windows.Application;
 using Cursor = System.Windows.Input.Cursor;
 using Cursors = System.Windows.Input.Cursors;
 using FileDialog = Microsoft.Win32.FileDialog;
@@ -25,7 +19,8 @@ namespace VideoPlayer.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        private readonly VideoDurationXmlSaver _videoDurationXmlSaver = new VideoDurationXmlSaver(@"Test.xml");
+        private readonly VideoDurationXmlSaver _videoDurationXmlSaver = 
+            new VideoDurationXmlSaver(@"Test1.xml", 10);
 
         #region title : string - Title of window
 
@@ -44,7 +39,7 @@ namespace VideoPlayer.ViewModels
         public bool IsVideoElementHovered { get; set; }
         private bool _isHidden;
 
-        private int _timerTime = 0;
+        private int _timerTime;
 
         private DispatcherTimer _timer;
 
@@ -134,7 +129,7 @@ namespace VideoPlayer.ViewModels
 
         #region lastFolder : Stack<SimpleFolder> - Last opened folder
 
-        private readonly Stack<SimpleFolder> _lastFolders;
+        private Stack<SimpleFolder> _lastFolders;
 
         #region SimpleFolder : SimpleFolder - Last Folder
 
@@ -189,6 +184,9 @@ namespace VideoPlayer.ViewModels
         
         private void OnOpenVideoCommandExecuted(object p)
         {
+            _lastFolders.Clear();
+            LastFolder = null;
+
             FileDialog fileDialog = new OpenFileDialog();
             fileDialog.Filter = "All Media Files|*.avi;*.mp4;*.mkv;";
 
@@ -214,14 +212,14 @@ namespace VideoPlayer.ViewModels
 
         #region SetMouseStateCommand
 
-        public ICommand SetMouseStateCommand { get; }
+        public ICommand VideoElementHoveredCommand { get; }
 
-        private void OnSetMouseStateCommandExecuted(object p)
+        private void OnVideoElementHoveredCommandExecuted(object p)
         {
             IsVideoElementHovered = bool.Parse(p.ToString());
         }
 
-        private bool CanSetMouseStateCommandExecute(object p) => true;
+        private bool CanVideoElementHoveredCommandExecute(object p) => true;
 
         #endregion
 
@@ -265,19 +263,20 @@ namespace VideoPlayer.ViewModels
 
         private void OnOpenFolderCommandExecuted(object p)
         {
+            _lastFolders.Clear();
+            LastFolder = null;
+
             var dlg = new CommonOpenFileDialog {IsFolderPicker = true, Multiselect = false};
             
             if (dlg.ShowDialog() == CommonFileDialogResult.Cancel) return;
 
-            Folder folder1 = new Folder
+            CurrentFolder = new Folder
             {
                 Folders = FolderService.GetFolders(dlg.FileName),
                 Videos = VideoService.GetVideos(dlg.FileName),
                 Name = dlg.FileName,
                 Path = dlg.FileName
             };
-
-            CurrentFolder = folder1;
         }
 
         private bool CanOpenFolderCommandExecute(object p) => true;
@@ -313,8 +312,9 @@ namespace VideoPlayer.ViewModels
 
             ChangeCurrentFolderWith(LastFolder);
 
+            if (_lastFolders.Count == 0) LastFolder = null;
+
             if (_lastFolders.Count > 0) LastFolder = _lastFolders.Peek();
-            
         }
 
         private bool CanBackToLastFolderCommandExecute(object p) => _lastFolders.Count > 0;
@@ -377,13 +377,11 @@ namespace VideoPlayer.ViewModels
 
         private void OnChangeCurrentPositionWithStoppedTimeCommandExecuted(object p)
         {
-            CurrentPlayedVideo.CurrentPosition = _videoDurationXmlSaver.GetDurationFromXml(CurrentPlayedVideo.Path.OriginalString,
-                CurrentPlayedVideo.Name);
+            CurrentPlayedVideo.CurrentPosition = _videoDurationXmlSaver.
+                GetDurationFromXml(CurrentPlayedVideo.Path.OriginalString, CurrentPlayedVideo.Name);
 
             CurrentPlayedVideo.CanPositionBeChangedToStoppedTime = false;
             CurrentPlayedVideo.IsPositionChanged = true;
-
-            OnPropertyChanged("CurrentPlayedVideo");
         }
 
         private bool CanChangeCurrentPositionWithStoppedTimeCommandExecute(object p)
@@ -409,7 +407,8 @@ namespace VideoPlayer.ViewModels
             ToggleMinCommand = new ActionCommand(OnToggleMinCommandExecuted, CanToggleMinCommandExecute);
             PlayPrevNextVideoCommand =
                 new ActionCommand(OnPlayPrevNextVideoCommandExecuted, CanPlayPrevNextVideoCommandExecute);
-            SetMouseStateCommand = new ActionCommand(OnSetMouseStateCommandExecuted, CanSetMouseStateCommandExecute);
+            VideoElementHoveredCommand = 
+                new ActionCommand(OnVideoElementHoveredCommandExecuted, CanVideoElementHoveredCommandExecute);
             ChangeVisibilityCommand =
                 new ActionCommand(OnChangeVisibilityCommandExecuted, CanChangeVisibilityCommandExecute);
             VideosSourceUpdateCommand =
@@ -432,6 +431,8 @@ namespace VideoPlayer.ViewModels
 
         private void SetStoppedTime()
         {
+            if (CurrentPlayedVideo == null) return;
+
             CurrentPlayedVideo.StoppedPosition =
                 _videoDurationXmlSaver.GetDurationFromXml(CurrentPlayedVideo.Path.LocalPath, CurrentPlayedVideo.Name);
 
@@ -443,15 +444,13 @@ namespace VideoPlayer.ViewModels
         {
             CurrentPlayedVideo = null;
 
-            Folder folder1 = new Folder
+            CurrentFolder = new Folder
             {
                 Folders = FolderService.GetFolders(folder.Path),
                 Videos = VideoService.GetVideos(folder.Path),
                 Name = folder.Name,
                 Path = folder.Path
             };
-
-            CurrentFolder = folder1;
         }
 
         private void TimerOnTick(object sender, EventArgs e)

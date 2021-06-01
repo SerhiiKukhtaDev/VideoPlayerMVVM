@@ -28,7 +28,8 @@
                     <GradientStop Color="Black"/>
                     <GradientStop Color="#00000000"/>
                     <GradientStop Color="Black" Offset="0.986"/>
-                    <GradientStop Color="#19000000" Offset="0.052"/>
+                    <GradientStop Color="#00000000"/>
+                    <GradientStop Color="#00000000" Offset="0.056"/>
                 </LinearGradientBrush>
             </Grid.Background>
         </Grid>
@@ -66,14 +67,14 @@
 
                 </DockPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Style="{StaticResource CornerButton1}" Command="{Binding PlayPrevNextVideoCommand}"
+                    <Button Style="{StaticResource CornerButton}" Command="{Binding PlayPrevNextVideoCommand}"
                             CommandParameter="-1">
                         <Button.Content>
                             <fa:ImageAwesome x:Name="DoubleArrowLeftButton" Margin="5" Foreground="{StaticResource VideoPlayerButtonColor}" Icon="AngleDoubleLeft"></fa:ImageAwesome>
                         </Button.Content>
                     </Button>
                     <Button Command="{Binding PlayPrevNextVideoCommand}" 
-                            CommandParameter="1" Style="{StaticResource CornerButton1}">
+                            CommandParameter="1" Style="{StaticResource CornerButton}">
                         <Button.Content>
                             <fa:ImageAwesome Margin="5" Foreground="{StaticResource VideoPlayerButtonColor}" Icon="AngleDoubleRight"></fa:ImageAwesome>
                         </Button.Content>
@@ -85,7 +86,7 @@
                         <ToggleButton.Style>
                             <Style BasedOn="{StaticResource {x:Static gu:Styles.PlayerButtonBaseStyleKey}}" TargetType="{x:Type ToggleButton}">
                                 <Setter Property="gu:Icon.Geometry" Value="{StaticResource {x:Static gu:Geometries.PlayGeometryKey}}" />
-                                <Setter Property="Background" Value="White"></Setter>
+                                <Setter Property="Background" Value="{StaticResource VideoPlayerButtonColor}"></Setter>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsPlaying, ElementName=VideoMediaElement}" Value="True">
                                         <Setter Property="gu:Icon.Geometry" Value="{StaticResource {x:Static gu:Geometries.PauseGeometryKey}}" />
@@ -122,7 +123,7 @@
                                 Minimum="0" Maximum="1" IsMoveToPointEnabled="True">
                         </Slider>
                     </StackPanel>
-                    <Button x:Name="ChangePosWithStoppedTimeButton" Foreground="White" Width="120" 
+                    <Button x:Name="ChangePosWithStoppedTimeButton" Width="120"
                             Style="{StaticResource VideoTextButton}"
                             Command="{Binding ChangeCurrentPositionWithStoppedTimeCommand}"
                             CommandParameter="-1">
